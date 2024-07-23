@@ -11,21 +11,25 @@
             <div>
                 <label for="email">Email:</label>
                 <input type="email" v-model="form.email" id="email" required />
+                <span v-if="emailError">{{ emailError }}</span>
             </div>
 
             <div>
                 <label for="street">Calle:</label>
                 <input type="text" v-model="form.address.street" id="street" required />
+                <span v-if="streetError">{{ streetError }}</span>
             </div>
 
             <div>
                 <label for="phone">Teléfono:</label>
                 <input type="text" v-model="form.phone" id="phone" required />
+                <span v-if="phoneError">{{ phoneError }}</span>
             </div>
 
             <div>
                 <label for="website">Sitio Web:</label>
                 <input type="text" v-model="form.website" id="website" required />
+                <span v-if="websiteError">{{ websiteError }}</span>
             </div>
 
             <button type="submit">{{ isEditing ? 'Actualizar' : 'Agregar' }}</button>
@@ -60,9 +64,14 @@ export default {
                 website: ''
             },
             isEditing: false,
-            nameError: ''
+            nameError: '',
+            emailError: '',
+            streetError: '',
+            phoneError: '',
+            websiteError: ''
         };
     },
+
     created() {
         this.fetchUsers();
     },
@@ -85,15 +94,48 @@ export default {
                 }
             }
         },
+
         validateForm() {
             this.nameError = '';
+            this.emailError = '';
+            this.streetError = '';
+            this.phoneError = '';
+            this.websiteError = '';
+
             const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ\s]+$/;
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            const streetRegex = /^[A-Za-z0-9À-ÖØ-öø-ÿÑñ\s]+$/;
+            const phoneRegex = /^\d{10}$/;
+            const websiteRegex = /^https:\/\/[A-Za-z0-9.-]+\.[a-zA-Z]{2,}(\/[A-Za-z0-9._~:/?#@!$&'()*+,;=-]*)?$/;
+
             if (!nameRegex.test(this.form.name)) {
                 this.nameError = 'El nombre solo puede contener letras, incluyendo acentos y ñ';
                 return false;
             }
+
+            if (!emailRegex.test(this.form.email)) {
+                this.emailError = 'Por favor, ingrese un correo válido, ejemplo: algo24deejemplo@correo.com';
+                return false;
+            }
+
+            if (!streetRegex.test(this.form.address.street)) {
+                this.streetError = 'La calle solo puede contener caracteres alfanuméricos';
+                return false;
+            }
+
+            if (!phoneRegex.test(this.form.phone)) {
+                this.phoneError = 'El teléfono debe contener solo números y tener 10 dígitos';
+                return false;
+            }
+
+            if (!websiteRegex.test(this.form.website)) {
+                this.websiteError = 'El sitio web debe usar el esquema https y puede contener caracteres alfanuméricos y caracteres especiales';
+                return false;
+            }
+
             return true;
         },
+
         addUser() {
             const newUser = {
                 id: Date.now(),
