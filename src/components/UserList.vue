@@ -1,112 +1,111 @@
-
-
 <template>
-    <div class="max-w-lg mx-auto mt-10">
+    <div class="max-w-5xl mx-auto mt-10">
         <h1 class="text-3xl font-bold underline mb-6">Lista de Usuarios</h1>
         <form @submit.prevent="handleSubmit" class="space-y-4">
+      
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Nombre:</label>
+                <label for="name" class="flex justify-start text-sm font-medium text-gray-700">Nombre:</label>
                 <input
                     type="text"
                     v-model="form.name"
                     id="name"
                     required
-                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-left"
                 />
                 <span v-if="nameError" class="text-red-500 text-sm">{{ nameError }}</span>
             </div>
 
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
-        <input
-          type="email"
-          v-model="form.email"
-          id="email"
-          required
-          class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <span v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</span>
-      </div>
+            <div>
+                <label for="email" class="flex justify-start text-sm font-medium text-gray-700">Email:</label>
+                <input
+                    type="email"
+                    v-model="form.email"
+                    id="email"
+                    required
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</span>
+            </div>
 
-      <div>
-        <label for="street" class="block text-sm font-medium text-gray-700">Calle:</label>
-        <input
-          type="text"
-          v-model="form.address.street"
-          id="street"
-          required
-          class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <span v-if="streetError" class="text-red-500 text-sm">{{ streetError }}</span>
-      </div>
+            <div>
+                <label for="street" class="flex justify-start text-sm font-medium text-gray-700">Calle:</label>
+                <input
+                    type="text"
+                    v-model="form.address.street"
+                    id="street"
+                    required
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span v-if="streetError" class="text-red-500 text-sm">{{ streetError }}</span>
+            </div>
 
-      <div>
-        <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono:</label>
-        <input
-          type="text"
-          v-model="form.phone"
-          id="phone"
-          required
-          class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
-      </div>
+            <div>
+                <label for="phone" class="flex justify-start text-sm font-medium text-gray-700">Teléfono:</label>
+                <input
+                    type="text"
+                    v-model="form.phone"
+                    id="phone"
+                    required
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
+            </div>
 
-      <div>
-        <label for="website" class="block text-sm font-medium text-gray-700">Sitio Web:</label>
-        <input
-          type="text"
-          v-model="form.website"
-          id="website"
-          required
-          class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <span v-if="websiteError" class="text-red-500 text-sm">{{ websiteError }}</span>
-      </div>
+            <div>
+                <label for="website" class="flex justify-start text-sm font-medium text-gray-700">Sitio Web:</label>
+                <input
+                    type="text"
+                    v-model="form.website"
+                    id="website"
+                    required
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span v-if="websiteError" class="text-red-500 text-sm">{{ websiteError }}</span>
+            </div>
 
-      <div class="flex space-x-4">
-        <button
-          type="submit"
-          class="px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {{ isEditing ? 'Actualizar' : 'Agregar' }}
-        </button>
-        <button
-          type="button"
-          @click="resetForm"
-          class="px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
+            <div class="flex justify-end space-x-4 mt-4">
+                <button
+                    type="submit"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    {{ isEditing ? 'Actualizar' : 'Agregar' }}
+                </button>
+                <button
+                    type="button"
+                    @click="resetForm"
+                    class="px-4 py-2 bg-gray-500 text-white rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                    Cancelar
+                </button>
+            </div>
+        </form>
 
-    <ul class="mt-6 space-y-2 w-full">
-      <li
-        v-for="user in users"
-        :key="user.id"
-        class="flex justify-between items-center p-4 border border-gray-300 rounded-md w-full"
-      >
-        <div>
-          {{ user.name }} - {{ user.email }} - {{ user.address.street }} - {{ user.phone }} - {{ user.website }}
-        </div>
-        <div class="space-x-2">
-          <button
-            @click="editUser(user)"
-            class="px-2 py-1 bg-yellow-500 text-white rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-          >
-            Editar
-          </button>
-          <button
-            @click="deleteUser(user.id)"
-            class="px-2 py-1 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            Eliminar
-          </button>
-        </div>
-      </li>
-    </ul>
-  </div>
+        <ul class="mt-6 space-y-2 w-full">
+            <li
+                v-for="user in users"
+                :key="user.id"
+                class="flex justify-between items-center p-4 border border-gray-300 rounded-md w-full"
+            >
+                <div class="flex-grow">
+                    {{ user.name }} - {{ user.email }} - {{ user.address.street }} - {{ user.phone }} - {{ user.website }}
+                </div>
+                <div class="flex-shrink-0 space-x-2">
+                    <button
+                        @click="editUser(user)"
+                        class="px-2 py-1 bg-yellow-500 text-white rounded-md shadow-sm hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                    >
+                        Editar
+                    </button>
+                    <button
+                        @click="deleteUser(user.id)"
+                        class="px-2 py-1 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    >
+                        Eliminar
+                    </button>
+                </div>
+            </li>
+        </ul>
+    </div>
 </template>
 
 
