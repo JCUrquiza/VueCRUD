@@ -1,3 +1,4 @@
+
 <template>
     <div class="max-w-5xl mx-auto mt-10 bg-gradient-to-r from-sky-100 via-blue-100 to-green-100 p-8 rounded-lg">
 
@@ -42,12 +43,33 @@
             </div>
 
             <div>
+                <label for="lat" class="flex justify-start text-sm font-medium text-gray-700">Latitud:</label>
+                <input
+                    type="text"
+                    v-model="form.address.geo.lat"
+                    id="lat"
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
+            <div>
+                <label for="lng" class="flex justify-start text-sm font-medium text-gray-700">Longitud:</label>
+                <input
+                    type="text"
+                    v-model="form.address.geo.lng"
+                    id="lng"
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
+            <div>
                 <label for="phone" class="flex justify-start text-sm font-medium text-gray-700">Teléfono:</label>
                 <input
                     type="text"
                     v-model="form.phone"
                     id="phone"
                     required
+                    maxlength="10"
                     class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <span v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</span>
@@ -59,10 +81,31 @@
                     type="text"
                     v-model="form.website"
                     id="website"
-                    required
                     class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <span v-if="websiteError" class="text-red-500 text-sm">{{ websiteError }}</span>
+            </div>
+
+            <div>
+                <label for="companyName" class="flex justify-start text-sm font-medium text-gray-700">Nombre de la Compañía:</label>
+                <input
+                    type="text"
+                    v-model="form.company.name"
+                    id="companyName"
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span v-if="companyNameError" class="text-red-500 text-sm">{{ companyNameError }}</span>
+            </div>
+
+            <div>
+                <label for="companyCatchPhrase" class="flex justify-start text-sm font-medium text-gray-700">Eslogan de la Compañía:</label>
+                <input
+                    type="text"
+                    v-model="form.company.catchPhrase"
+                    id="companyCatchPhrase"
+                    class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span v-if="companyCatchPhraseError" class="text-red-500 text-sm">{{ companyCatchPhraseError }}</span>
             </div>
 
             <div class="flex justify-end space-x-4 mt-4">
@@ -89,7 +132,10 @@
                 class="flex justify-between items-center p-4 w-full bg-white rounded-lg shadow-md"
             >
                 <div class="flex-grow">
-                    {{ user.name }} - {{ user.email }} - {{ user.address.street }} - {{ user.phone }} - {{ user.website }}
+                    {{ user.name }} - {{ user.email }} - {{ user.address.street }} - 
+                    {{ user.address.geo.lat }}, {{ user.address.geo.lng }} - 
+                    {{ user.phone }} - {{ user.website }} - 
+                    {{ user.company.name }} - {{ user.company.catchPhrase }}
                 </div>
                 <div class="flex-shrink-0 space-x-2">
                     <button
@@ -110,7 +156,6 @@
     </div>
 
     <ToastContainer />
-
 </template>
 
 
@@ -119,6 +164,7 @@ import axios from 'axios';
 import { toast } from '../main';
 
 export default {
+    // En la sección data del componente
     data() {
         return {
             users: [],
@@ -127,10 +173,18 @@ export default {
                 name: '',
                 email: '',
                 address: {
-                    street: ''
+                    street: '',
+                    geo: {
+                        lat: '',
+                        lng: ''
+                    }
                 },
                 phone: '',
-                website: ''
+                website: '',
+                company: {
+                    name: '',
+                    catchPhrase: ''
+                }
             },
             isEditing: false,
             nameError: '',
@@ -138,10 +192,11 @@ export default {
             streetError: '',
             phoneError: '',
             websiteError: '',
+            companyNameError: '',
+            companyCatchPhraseError: '',
             formTouched: false
         };
     },
-
     created() {
         this.fetchUsers();
     },
@@ -149,11 +204,25 @@ export default {
         async fetchUsers() {
             try {
                 const response = await axios.get('https://jsonplaceholder.typicode.com/users');
-                this.users = response.data;
+                this.users = response.data.map(user => ({
+                    ...user,
+                    address: {
+                        ...user.address,
+                        geo: {
+                            lat: user.address.geo.lat,
+                            lng: user.address.geo.lng
+                        }
+                    },
+                    company: {
+                        name: user.company.name,
+                        catchPhrase: user.company.catchPhrase
+                    }
+                }));
                 console.log(this.users);
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
+
         },
         handleSubmit() {
             this.formTouched = true;
@@ -177,13 +246,17 @@ export default {
             this.streetError = '';
             this.phoneError = '';
             this.websiteError = '';
+            this.latError = '';
+            this.lngError = '';
+            this.companyNameError = '';
+            this.companyCatchPhraseError = '';
 
             const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ\s]+$/;
             const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             const streetRegex = /^[A-Za-z0-9À-ÖØ-öø-ÿÑñ\s]+$/;
             const phoneRegex = /^\d{10}$/;
             const websiteRegex = /^https:\/\/[A-Za-z0-9.-]+\.[a-zA-Z]{2,}(\/[A-Za-z0-9._~:/?#@!$&'()*+,;=-]*)?$/;
-
+            
             // Validación de campos
             let isValid = true;
 
@@ -236,15 +309,27 @@ export default {
                 name: this.form.name,
                 email: this.form.email,
                 address: {
-                    street: this.form.address.street
+                    street: this.form.address.street,
+                    geo: {
+                        lat: this.form.address.geo.lat,
+                        lng: this.form.address.geo.lng
+                    }
                 },
                 phone: this.form.phone,
-                website: this.form.website
+                website: this.form.website,
+                company: {
+                    name: this.form.company.name,
+                    catchPhrase: this.form.company.catchPhrase
+                }
             };
             this.users.push(newUser);
             this.saveUsers();
             this.resetForm();
         },
+
+
+
+
         editUser(user) {
             this.form = { ...user, address: { ...user.address } };
             this.isEditing = true;
@@ -252,7 +337,20 @@ export default {
         updateUser() {
             const index = this.users.findIndex(u => u.id === this.form.id);
             if (index !== -1) {
-                this.users.splice(index, 1, { ...this.form, address: { ...this.form.address } });
+                this.users.splice(index, 1, {
+                    ...this.form,
+                    address: {
+                        ...this.form.address,
+                        geo: {
+                            lat: this.form.address.geo.lat,
+                            lng: this.form.address.geo.lng
+                        }
+                    },
+                    company: {
+                        name: this.form.company.name,
+                        catchPhrase: this.form.company.catchPhrase
+                    }
+                });
                 this.saveUsers();
                 this.resetForm();
             }
@@ -280,17 +378,33 @@ export default {
         },
         resetForm() {
             this.form = {
-                id: null,
-                name: '',
-                email: '',
-                address: {
-                    street: ''
-                },
-                phone: '',
-                website: ''
-            };
-            this.isEditing = false;
-            this.nameError = '';
+        id: null,
+        name: '',
+        email: '',
+        address: {
+            street: '',
+            geo: {
+                lat: '',
+                lng: ''
+            }
+        },
+        phone: '',
+        website: '',
+        company: {
+            name: '',
+            catchPhrase: ''
+        }
+    };
+    this.isEditing = false;
+    this.nameError = '';
+    this.emailError = '';
+    this.streetError = '';
+    this.phoneError = '';
+    this.websiteError = '';
+    this.latError = '';
+    this.lngError = '';
+    this.companyNameError = '';
+    this.companyCatchPhraseError = '';
         }
     }
 };
