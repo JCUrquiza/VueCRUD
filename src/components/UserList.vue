@@ -1,6 +1,8 @@
 <template>
-    <div class="max-w-5xl mx-auto mt-10">
-        <h1 class="text-3xl font-bold underline mb-6">Lista de Usuarios</h1>
+    <div class="max-w-5xl mx-auto mt-10 bg-gradient-to-r from-sky-100 via-blue-100 to-green-100 p-8 rounded-lg">
+
+        <h1 class="text-3xl font-bold mb-6">Lista de Usuarios</h1>
+
         <form @submit.prevent="handleSubmit" class="space-y-4">
       
             <div>
@@ -80,11 +82,11 @@
             </div>
         </form>
 
-        <ul class="mt-6 space-y-2 w-full">
+        <ul class="mt-8 space-y-2 w-full">
             <li
                 v-for="user in users"
                 :key="user.id"
-                class="flex justify-between items-center p-4 border border-gray-300 rounded-md w-full"
+                class="flex justify-between items-center p-4 w-full bg-white rounded-lg shadow-md"
             >
                 <div class="flex-grow">
                     {{ user.name }} - {{ user.email }} - {{ user.address.street }} - {{ user.phone }} - {{ user.website }}
@@ -106,12 +108,15 @@
             </li>
         </ul>
     </div>
-</template>
 
+    <ToastContainer />
+
+</template>
 
 
 <script>
 import axios from 'axios';
+import { toast } from '../main';
 
 export default {
     data() {
@@ -132,7 +137,8 @@ export default {
             emailError: '',
             streetError: '',
             phoneError: '',
-            websiteError: ''
+            websiteError: '',
+            formTouched: false
         };
     },
 
@@ -150,12 +156,18 @@ export default {
             }
         },
         handleSubmit() {
+            this.formTouched = true;
             if (this.validateForm()) {
                 if (this.isEditing) {
                     this.updateUser();
                 } else {
                     this.addUser();
                 }
+            } else {
+                toast.error('No se puede realizar el guardado, revisa tus datos', {
+                    position: 'top-right',
+                    autoClose: 3000,
+                });
             }
         },
 
@@ -172,32 +184,50 @@ export default {
             const phoneRegex = /^\d{10}$/;
             const websiteRegex = /^https:\/\/[A-Za-z0-9.-]+\.[a-zA-Z]{2,}(\/[A-Za-z0-9._~:/?#@!$&'()*+,;=-]*)?$/;
 
+            // Validación de campos
+            let isValid = true;
+
             if (!nameRegex.test(this.form.name)) {
-                this.nameError = 'El nombre solo puede contener letras, incluyendo acentos y ñ';
-                return false;
+                this.nameError = 'El nombre solo puede contener letras, incluyendo acentos y la letra "ñ"';
+                isValid = false;
+            } else if (this.formTouched && !this.form.name) {
+                this.nameError = 'El nombre es requerido';
+                isValid = false;
             }
 
             if (!emailRegex.test(this.form.email)) {
                 this.emailError = 'Por favor, ingrese un correo válido, ejemplo: algo24deejemplo@correo.com';
-                return false;
+                isValid = false;
+            } else if (this.formTouched && !this.form.email) {
+                this.emailError = 'El email es requerido';
+                isValid = false;
             }
 
             if (!streetRegex.test(this.form.address.street)) {
                 this.streetError = 'La calle solo puede contener caracteres alfanuméricos';
-                return false;
+                isValid = false;
+            } else if (this.formTouched && !this.form.address.street) {
+                this.streetError = 'La calle es requerida';
+                isValid = false;
             }
 
             if (!phoneRegex.test(this.form.phone)) {
                 this.phoneError = 'El teléfono debe contener solo números y tener 10 dígitos';
-                return false;
+                isValid = false;
+            } else if (this.formTouched && !this.form.phone) {
+                this.phoneError = 'El teléfono es requerido';
+                isValid = false;
             }
 
             if (!websiteRegex.test(this.form.website)) {
                 this.websiteError = 'El sitio web debe usar el esquema https y puede contener caracteres alfanuméricos y caracteres especiales';
-                return false;
+                isValid = false;
+            } else if (this.formTouched && !this.form.website) {
+                this.websiteError = 'El sitio web es requerido';
+                isValid = false;
             }
 
-            return true;
+            return isValid;
         },
 
         addUser() {
@@ -240,6 +270,13 @@ export default {
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
             linkElement.click();
+
+            
+            // Mostrar notificación de éxito
+            toast.success('Guardado Exitosamente', {
+                position: 'top-right',
+                autoClose: 3000, // Tiempo en milisegundos
+            });
         },
         resetForm() {
             this.form = {
@@ -261,25 +298,24 @@ export default {
 
 
 <style scoped>
-    h1 {
-        font-family: Arial, sans-serif;
-    }
-    form {
-        margin-bottom: 20px;
-    }
-    ul {
-        list-style-type: none;
-        padding: 0;
-    }
-    li {
-        padding: 5px 0;
-    }
-    button {
-        margin-left: 10px;
-    }
-    span {
-        color: red;
-    }
+h1 {
+    font-family: Arial, sans-serif;
+}
+form {
+    margin-bottom: 20px;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    padding: 10px 0;
+}
+button {
+    margin-left: 10px;
+}
+span {
+    color: red;
+}
 </style>
-
 
